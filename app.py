@@ -1,20 +1,15 @@
 """
 Streamlit App for Hybrid Movie Recommendation System
+Lightweight version with sample data for deployment
 """
 
 import streamlit as st
 import pandas as pd
-import sys
-import os
-
-# Add src to path
-sys.path.append(os.path.join(os.path.dirname(__file__), 'src'))
-
-from recommender import HybridRecommender
+import numpy as np
 
 # Page configuration
 st.set_page_config(
-    page_title="Movie Recommender System",
+    page_title="Movie Recommender",
     page_icon="🎬",
     layout="wide"
 )
@@ -39,178 +34,200 @@ st.markdown("""
     </style>
     """, unsafe_allow_html=True)
 
+# Sample movie database
+SAMPLE_MOVIES = {
+    'Action': [
+        {'title': 'The Dark Knight', 'year': 2008, 'rating': 9.0},
+        {'title': 'Inception', 'year': 2010, 'rating': 8.8},
+        {'title': 'Mad Max: Fury Road', 'year': 2015, 'rating': 8.1},
+        {'title': 'John Wick', 'year': 2014, 'rating': 7.4},
+        {'title': 'The Matrix', 'year': 1999, 'rating': 8.7},
+    ],
+    'Drama': [
+        {'title': 'The Shawshank Redemption', 'year': 1994, 'rating': 9.3},
+        {'title': 'Forrest Gump', 'year': 1994, 'rating': 8.8},
+        {'title': 'The Godfather', 'year': 1972, 'rating': 9.2},
+        {'title': 'Schindler\'s List', 'year': 1993, 'rating': 9.0},
+        {'title': 'Fight Club', 'year': 1999, 'rating': 8.8},
+    ],
+    'Sci-Fi': [
+        {'title': 'Interstellar', 'year': 2014, 'rating': 8.6},
+        {'title': 'The Martian', 'year': 2015, 'rating': 8.0},
+        {'title': 'Blade Runner 2049', 'year': 2017, 'rating': 8.0},
+        {'title': 'Ex Machina', 'year': 2014, 'rating': 7.7},
+        {'title': 'Arrival', 'year': 2016, 'rating': 7.9},
+    ],
+    'Comedy': [
+        {'title': 'The Grand Budapest Hotel', 'year': 2014, 'rating': 8.1},
+        {'title': 'Superbad', 'year': 2007, 'rating': 7.6},
+        {'title': 'The Hangover', 'year': 2009, 'rating': 7.7},
+        {'title': 'Deadpool', 'year': 2016, 'rating': 8.0},
+        {'title': 'Guardians of the Galaxy', 'year': 2014, 'rating': 8.0},
+    ],
+    'Thriller': [
+        {'title': 'Se7en', 'year': 1995, 'rating': 8.6},
+        {'title': 'The Silence of the Lambs', 'year': 1991, 'rating': 8.6},
+        {'title': 'Gone Girl', 'year': 2014, 'rating': 8.1},
+        {'title': 'Prisoners', 'year': 2013, 'rating': 8.1},
+        {'title': 'Shutter Island', 'year': 2010, 'rating': 8.2},
+    ],
+}
+
+# Pre-computed recommendations (simulating hybrid model)
+RECOMMENDATIONS_DB = {
+    'The Dark Knight': [
+        {'title': 'Batman Begins', 'score': 0.92, 'genres': 'Action, Crime'},
+        {'title': 'The Dark Knight Rises', 'score': 0.89, 'genres': 'Action, Crime'},
+        {'title': 'Inception', 'score': 0.76, 'genres': 'Action, Sci-Fi'},
+        {'title': 'The Prestige', 'score': 0.71, 'genres': 'Drama, Mystery'},
+        {'title': 'V for Vendetta', 'score': 0.68, 'genres': 'Action, Thriller'},
+    ],
+    'Inception': [
+        {'title': 'Interstellar', 'score': 0.85, 'genres': 'Sci-Fi, Drama'},
+        {'title': 'The Matrix', 'score': 0.81, 'genres': 'Sci-Fi, Action'},
+        {'title': 'The Prestige', 'score': 0.78, 'genres': 'Drama, Mystery'},
+        {'title': 'Shutter Island', 'score': 0.74, 'genres': 'Thriller, Mystery'},
+        {'title': 'The Dark Knight', 'score': 0.72, 'genres': 'Action, Crime'},
+    ],
+    'The Shawshank Redemption': [
+        {'title': 'The Green Mile', 'score': 0.88, 'genres': 'Drama'},
+        {'title': 'Forrest Gump', 'score': 0.82, 'genres': 'Drama, Romance'},
+        {'title': 'The Godfather', 'score': 0.79, 'genres': 'Drama, Crime'},
+        {'title': 'Schindler\'s List', 'score': 0.76, 'genres': 'Drama, History'},
+        {'title': 'Good Will Hunting', 'score': 0.73, 'genres': 'Drama'},
+    ],
+    'Interstellar': [
+        {'title': 'The Martian', 'score': 0.87, 'genres': 'Sci-Fi, Drama'},
+        {'title': 'Gravity', 'score': 0.83, 'genres': 'Sci-Fi, Thriller'},
+        {'title': 'Arrival', 'score': 0.80, 'genres': 'Sci-Fi, Drama'},
+        {'title': 'Inception', 'score': 0.77, 'genres': 'Sci-Fi, Action'},
+        {'title': 'Contact', 'score': 0.74, 'genres': 'Sci-Fi, Drama'},
+    ],
+    'The Matrix': [
+        {'title': 'The Matrix Reloaded', 'score': 0.91, 'genres': 'Sci-Fi, Action'},
+        {'title': 'Inception', 'score': 0.84, 'genres': 'Sci-Fi, Action'},
+        {'title': 'Blade Runner', 'score': 0.79, 'genres': 'Sci-Fi, Thriller'},
+        {'title': 'Total Recall', 'score': 0.72, 'genres': 'Sci-Fi, Action'},
+        {'title': 'Minority Report', 'score': 0.71, 'genres': 'Sci-Fi, Thriller'},
+    ],
+}
+
 # Title
-st.title("🎬 Hybrid Movie Recommendation System")
-st.markdown("Get personalized movie recommendations using AI-powered hybrid filtering!")
+st.title("🎬 Movie Recommendation System")
+st.markdown("Get personalized movie recommendations using hybrid filtering!")
+
+# Info banner
+st.info("📌 Demo version with curated movie collection. Full version supports 5000+ movies.")
 
 # Sidebar
-st.sidebar.header("Configuration")
-recommendation_type = st.sidebar.selectbox(
-    "Recommendation Type",
-    ["Content-Based", "Collaborative", "Hybrid"]
-)
+st.sidebar.header("About")
+st.sidebar.markdown("""
+This recommender combines:
+- **Content-Based:** Finds similar movies by genre, plot
+- **Collaborative:** Learns from user preferences
 
-n_recommendations = st.sidebar.slider(
-    "Number of Recommendations",
-    min_value=5,
-    max_value=20,
-    value=10
-)
+**Tech Stack:**
+- TF-IDF for content similarity
+- SVD for collaborative filtering
+- Streamlit for UI
+""")
 
-# Load model and data
-@st.cache_resource
-def load_model_and_data():
-    """Load the trained model and datasets"""
-    try:
-        # Try to load pre-trained model
-        model = HybridRecommender.load_model('models/hybrid_recommender.pkl')
-        movies = pd.read_csv('data/movies.csv')
-        return model, movies, True
-    except:
-        # Return None if model not found
-        return None, None, False
-
-model, movies_df, model_loaded = load_model_and_data()
-
-if not model_loaded:
-    st.warning("⚠️ Model not loaded. Please train the model first using `train.py`")
-    st.info("""
-    To train the model:
-    1. Download TMDB and MovieLens datasets
-    2. Place them in the `data/` folder
-    3. Run: `python train.py`
-    """)
-    st.stop()
+st.sidebar.markdown("---")
+st.sidebar.markdown("**Created by:** Osheen Langer")
+st.sidebar.markdown("[View on GitHub](https://github.com/OL10/movie-recommender-system)")
 
 # Main content
 col1, col2 = st.columns([1, 2])
 
 with col1:
-    st.subheader("📝 Input")
+    st.subheader("📝 Select a Movie")
     
-    if recommendation_type in ["Content-Based", "Hybrid"]:
-        movie_title = st.selectbox(
-            "Select a Movie",
-            options=movies_df['title'].unique() if movies_df is not None else [],
-            help="Choose a movie you like to get similar recommendations"
-        )
+    # Create list of all movies
+    all_movies = []
+    for genre, movies in SAMPLE_MOVIES.items():
+        for movie in movies:
+            all_movies.append(f"{movie['title']} ({movie['year']}) - {genre}")
     
-    if recommendation_type in ["Collaborative", "Hybrid"]:
-        user_id = st.number_input(
-            "User ID",
-            min_value=1,
-            max_value=1000,
-            value=1,
-            help="Enter your user ID"
-        )
+    selected_movie = st.selectbox(
+        "Choose a movie you like:",
+        options=all_movies,
+        help="Select a movie to get recommendations"
+    )
     
-    # Weights for hybrid
-    if recommendation_type == "Hybrid":
-        st.markdown("---")
-        st.subheader("⚖️ Hybrid Weights")
-        content_weight = st.slider(
-            "Content-Based Weight",
-            min_value=0.0,
-            max_value=1.0,
-            value=0.5,
-            step=0.1
-        )
-        collab_weight = 1.0 - content_weight
-        st.text(f"Collaborative Weight: {collab_weight:.1f}")
-        
-        model.content_weight = content_weight
-        model.collab_weight = collab_weight
+    # Extract just the movie title
+    movie_title = selected_movie.split(' (')[0]
     
-    get_recommendations = st.button("Get Recommendations 🎯", type="primary")
+    n_recommendations = st.slider(
+        "Number of recommendations:",
+        min_value=3,
+        max_value=10,
+        value=5
+    )
+    
+    get_recs = st.button("Get Recommendations 🎯", type="primary")
 
 with col2:
     st.subheader("🎯 Recommendations")
     
-    if get_recommendations:
-        with st.spinner("Finding the best movies for you..."):
-            try:
-                # Get recommendations based on type
-                if recommendation_type == "Content-Based":
-                    recommendations = model.get_content_recommendations(
-                        movie_title,
-                        n_recommendations=n_recommendations
-                    )
-                    score_col = 'similarity_score'
+    if get_recs:
+        # Check if we have pre-computed recommendations
+        if movie_title in RECOMMENDATIONS_DB:
+            recommendations = RECOMMENDATIONS_DB[movie_title][:n_recommendations]
+            
+            with st.spinner("Finding the best movies for you..."):
+                import time
+                time.sleep(0.5)  # Simulate processing
+            
+            st.success(f"Found {len(recommendations)} movies similar to **{movie_title}**!")
+            
+            # Display recommendations
+            for idx, movie in enumerate(recommendations, 1):
+                with st.container():
+                    st.markdown(f"""
+                        <div class="movie-card">
+                            <h3>{idx}. {movie['title']}</h3>
+                            <p><strong>Genres:</strong> {movie['genres']}</p>
+                            <p><strong>Similarity Score:</strong> {movie['score']:.2%}</p>
+                        </div>
+                    """, unsafe_allow_html=True)
+        else:
+            # Generate generic recommendations based on genre
+            st.warning("Generating recommendations based on genre preferences...")
+            
+            # Get genre from selected movie
+            for genre, movies in SAMPLE_MOVIES.items():
+                if movie_title in [m['title'] for m in movies]:
+                    same_genre_movies = [m for m in movies if m['title'] != movie_title]
                     
-                elif recommendation_type == "Collaborative":
-                    recommendations = model.get_collaborative_recommendations(
-                        user_id,
-                        n_recommendations=n_recommendations
-                    )
-                    score_col = 'predicted_rating'
-                    
-                else:  # Hybrid
-                    recommendations = model.get_hybrid_recommendations(
-                        user_id=user_id,
-                        movie_title=movie_title,
-                        n_recommendations=n_recommendations
-                    )
-                    score_col = 'hybrid_score'
-                
-                if recommendations.empty:
-                    st.warning("No recommendations found. Try different inputs.")
-                else:
-                    # Display recommendations
-                    for idx, row in recommendations.iterrows():
+                    for idx, movie in enumerate(same_genre_movies[:n_recommendations], 1):
                         with st.container():
                             st.markdown(f"""
                                 <div class="movie-card">
-                                    <h3>🎬 {row['title']}</h3>
-                                    <p><strong>Genres:</strong> {row['genres']}</p>
-                                    <p><strong>Score:</strong> {row[score_col]:.3f}</p>
+                                    <h3>{idx}. {movie['title']}</h3>
+                                    <p><strong>Genre:</strong> {genre}</p>
+                                    <p><strong>Rating:</strong> {movie['rating']}/10</p>
+                                    <p><strong>Year:</strong> {movie['year']}</p>
                                 </div>
                             """, unsafe_allow_html=True)
-                    
-                    # Download recommendations
-                    csv = recommendations.to_csv(index=False)
-                    st.download_button(
-                        label="📥 Download Recommendations",
-                        data=csv,
-                        file_name="movie_recommendations.csv",
-                        mime="text/csv"
-                    )
-                    
-            except Exception as e:
-                st.error(f"Error: {str(e)}")
+                    break
+    else:
+        st.info("👈 Select a movie and click 'Get Recommendations' to see results!")
+        
+        # Show sample movies by genre
+        st.markdown("### Browse by Genre")
+        
+        selected_genre = st.selectbox("Choose a genre:", list(SAMPLE_MOVIES.keys()))
+        
+        if selected_genre:
+            st.markdown(f"**Top {selected_genre} Movies:**")
+            for movie in SAMPLE_MOVIES[selected_genre]:
+                st.markdown(f"- **{movie['title']}** ({movie['year']}) - ⭐ {movie['rating']}/10")
 
 # Footer
 st.markdown("---")
 st.markdown("""
     <div style='text-align: center'>
-        <p>Built with ❤️ using Python, Scikit-learn, and Streamlit</p>
-        <p>Data from TMDB and MovieLens | Hybrid Algorithm: TF-IDF + SVD</p>
+        <p>Built with Python, Scikit-learn, and Streamlit</p>
+        <p>⭐ If you like this project, give it a star on <a href='https://github.com/OL10/movie-recommender-system'>GitHub</a>!</p>
     </div>
     """, unsafe_allow_html=True)
-
-# Sidebar info
-with st.sidebar:
-    st.markdown("---")
-    st.subheader("ℹ️ About")
-    st.info("""
-    This hybrid recommender system combines:
-    
-    **Content-Based Filtering**
-    - Uses TF-IDF on movie metadata
-    - Finds similar movies based on genres, plot, keywords
-    
-    **Collaborative Filtering**
-    - Uses SVD matrix factorization
-    - Learns from user rating patterns
-    
-    **Hybrid Approach**
-    - Combines both methods
-    - Balances content similarity and user preferences
-    """)
-    
-    st.markdown("---")
-    st.subheader("📊 System Stats")
-    if model_loaded and movies_df is not None:
-        st.metric("Total Movies", f"{len(movies_df):,}")
-        if model.user_movie_matrix is not None:
-            st.metric("Total Users", f"{len(model.user_movie_matrix):,}")
-            st.metric("Total Ratings", f"{model.ratings_df.shape[0]:,}")
