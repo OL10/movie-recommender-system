@@ -452,9 +452,9 @@ with col2:
             genre = movie_data['genre']
             genres[genre] = genres.get(genre, 0) + 1
         
-        st.markdown("**By Genre:**")
-        for genre, count in sorted(genres.items()):
-            st.markdown(f"- {genre}: {count}")
+        # st.markdown("**By Genre:**")
+        # for genre, count in sorted(genres.items()):
+        #     st.markdown(f"- {genre}: {count}")
 
 # Footer
 st.markdown("---")
