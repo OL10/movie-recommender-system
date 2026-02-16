@@ -1,4 +1,4 @@
-# 🎬 Hybrid Movie Recommendation System
+# Hybrid Movie Recommendation System
 
 A production-ready movie recommendation engine that combines **Content-Based Filtering** (TF-IDF) and **Collaborative Filtering** (SVD) to deliver personalized movie recommendations.
 
