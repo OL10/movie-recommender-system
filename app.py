@@ -372,10 +372,7 @@ MOVIES_DATA = {
 
 # Title
 st.title("Movie Recommendation System")
-st.markdown("Hybrid filtering combining content-based and collaborative approaches")
 
-# Info banner
-st.info("Demo version with curated collection. Full system supports 5000+ movies with complete ML pipeline.")
 
 # Sidebar
 st.sidebar.header("About")
@@ -413,11 +410,11 @@ with col1:
     
     movie_title = selected_movie.split(' (')[0]
     
-    n_recommendations = st.slider(
-        "Number of recommendations:",
-        min_value=3,
-        max_value=10,
-        value=5
+    # n_recommendations = st.slider(
+    #     "Number of recommendations:",
+    #     min_value=3,
+    #     max_value=10,
+    #     value=5
     )
     
     get_recs = st.button("Get Recommendations", type="primary")
