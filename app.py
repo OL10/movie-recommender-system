@@ -10,7 +10,6 @@ import numpy as np
 # Page configuration
 st.set_page_config(
     page_title="Movie Recommender",
-    page_icon="🎬",
     layout="wide"
 )
 
@@ -109,6 +108,13 @@ RECOMMENDATIONS_DB = {
         {'title': 'Blade Runner', 'score': 0.79, 'genres': 'Sci-Fi, Thriller'},
         {'title': 'Total Recall', 'score': 0.72, 'genres': 'Sci-Fi, Action'},
         {'title': 'Minority Report', 'score': 0.71, 'genres': 'Sci-Fi, Thriller'},
+    ],
+    'Ex Machina': [
+        {'title': 'Blade Runner 2049', 'score': 0.88, 'genres': 'Sci-Fi, Thriller'},
+        {'title': 'Her', 'score': 0.84, 'genres': 'Sci-Fi, Drama'},
+        {'title': 'Arrival', 'score': 0.80, 'genres': 'Sci-Fi, Drama'},
+        {'title': 'Interstellar', 'score': 0.76, 'genres': 'Sci-Fi, Drama'},
+        {'title': 'The Martian', 'score': 0.72, 'genres': 'Sci-Fi, Drama'},
     ],
 }
 
