@@ -444,8 +444,8 @@ with col2:
         st.info("Select a movie and click 'Get Recommendations' to see similar films")
         
         # Statistics
-        st.markdown("### Dataset")
-        st.markdown(f"**Total Movies:** {len(MOVIES_DATA)}")
+        # st.markdown("### Dataset")
+        # st.markdown(f"**Total Movies:** {len(MOVIES_DATA)}")
         
         genres = {}
         for movie_data in MOVIES_DATA.values():
