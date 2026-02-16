@@ -412,7 +412,7 @@ with col1:
     
     n_recommendations = st.slider(
         "Number of recommendations:",
-    
+        max_value=5,
         value=5
     )
     
